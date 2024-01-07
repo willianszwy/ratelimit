@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  goapp:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+    environment:
+      - REDIS_PORT=6379
+  redis:
+    image: redis:latest
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis:/data
+volumes:
+  redis:
+    driver: local
