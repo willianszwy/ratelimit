@@ -1,5 +1,5 @@
 FROM golang:latest
 
-WORKDIR /app
+WORKDIR /app/cmd
 
 ENTRYPOINT ["go", "run", "."]

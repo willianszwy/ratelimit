@@ -1,12 +1,11 @@
 package main
 
 import (
-	"github.com/redis/go-redis/v9"
-	"net/http"
-	middleware2 "willianszwy/ratelimit/middleware"
-
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/redis/go-redis/v9"
+	"net/http"
+	ratelimit "willianszwy/ratelimit/internal/ratelimit/middleware"
 )
 
 func main() {
@@ -19,7 +18,7 @@ func main() {
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
-	r.Use(middleware2.RateLimitMiddleware(rdb))
+	r.Use(ratelimit.Middleware(rdb))
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Hello World!"))
 	})
