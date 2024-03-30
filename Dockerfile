@@ -1,5 +1,5 @@
 FROM golang:latest
 
-WORKDIR /app/cmd
-
-ENTRYPOINT ["go", "run", "."]
+WORKDIR /app
+COPY .env ./
+ENTRYPOINT ["go", "run", "cmd/main.go"]
