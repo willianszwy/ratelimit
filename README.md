@@ -18,6 +18,7 @@ docker-compose up
 ```
 
 ## Run Test
+You need to have siege installed on your system
 ```shell
 # load test by ip
 make test-by-ip
