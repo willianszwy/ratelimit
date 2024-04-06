@@ -7,6 +7,9 @@ limit by
 Código HTTP: 429
 Mensagem: you have reached the maximum number of requests or actions allowed within a certain time frame
 
+## database 
+you can change the persistence by implementing the keystorage interface.
+The current implementation uses redis
 ## Build
 ```shell
 docker-compose build
