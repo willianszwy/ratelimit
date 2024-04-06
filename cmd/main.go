@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"time"
 	"willianszwy/ratelimit/configs"
+	"willianszwy/ratelimit/internal/keystorage"
 	"willianszwy/ratelimit/internal/ratelimit"
 )
 
@@ -31,11 +32,14 @@ func main() {
 		TokenHeader:      config.TokenName,
 	}
 
+	ks := keystorage.New(rdb)
+
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
-	r.Use(ratelimit.Middleware(rlConfig, rdb))
+	r.Use(ratelimit.Middleware(rlConfig, ks))
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Hello World!"))
 	})
+	log.Println("Server started...")
 	http.ListenAndServe(":8080", r)
 }

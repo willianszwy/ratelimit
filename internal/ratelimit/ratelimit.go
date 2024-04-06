@@ -18,12 +18,12 @@ type Config struct {
 }
 
 type RateLimit struct {
-	rdb    *redis.Client
+	ks     KeyStorage
 	config Config
 }
 
-func New(config Config, rdb *redis.Client) *RateLimit {
-	return &RateLimit{rdb: rdb, config: config}
+func New(config Config, ks KeyStorage) *RateLimit {
+	return &RateLimit{ks: ks, config: config}
 }
 
 func (rl *RateLimit) Verify(r *http.Request) bool {
@@ -37,13 +37,13 @@ func (rl *RateLimit) Verify(r *http.Request) bool {
 
 func (rl *RateLimit) limitByToken(ctx context.Context, token string) bool {
 	log.Println("limiting by token")
-	log.Println(rl.rdb.TTL(ctx, token).String())
-	current, err := rl.rdb.Get(ctx, token).Int64()
-	if err != redis.Nil && current > rl.config.TokenMaxRequests {
+	log.Println(rl.ks.TTL(ctx, token))
+	current, err := rl.ks.Get(ctx, token)
+	if current > 0 && current > rl.config.TokenMaxRequests {
 		log.Println("err", err, "count", current)
 		return true
 	}
-	current, err = inc(ctx, rl.rdb, token, rl.config.TokenBlockedTime.Milliseconds())
+	current, err = rl.ks.Set(ctx, token, rl.config.TokenBlockedTime.Milliseconds())
 	if err != nil {
 		log.Println(err)
 	}
@@ -54,13 +54,13 @@ func (rl *RateLimit) limitByIp(r *http.Request) bool {
 	log.Println("limiting by ip")
 	ctx := r.Context()
 	ip, _, _ := net.SplitHostPort(r.RemoteAddr)
-	log.Println(rl.rdb.TTL(ctx, ip).String())
-	current, err := rl.rdb.Get(ctx, ip).Int64()
-	if err != redis.Nil && current > rl.config.IPMaxRequests {
+	log.Println(rl.ks.TTL(ctx, ip))
+	current, err := rl.ks.Get(ctx, ip)
+	if current > 0 && current > rl.config.IPMaxRequests {
 		log.Println("err", err, "count", current)
 		return true
 	}
-	current, err = inc(ctx, rl.rdb, ip, rl.config.IPBlockedTime.Milliseconds())
+	current, err = rl.ks.Set(ctx, ip, rl.config.IPBlockedTime.Milliseconds())
 	if err != nil {
 		log.Println(err)
 	}

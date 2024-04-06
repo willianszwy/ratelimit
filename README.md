@@ -25,7 +25,7 @@ make test-by-ip
 ```
 ```shell
 # load test with api key
-make test-apikey
+make test-api-key
 ```
 
 ### App Host
